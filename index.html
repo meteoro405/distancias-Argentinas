@@ -1,0 +1,410 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>¿A cuánto queda? — Distancias entre ciudades argentinas</title>
+<meta name="description" content="Distancia por ruta y tiempo de viaje entre 751 ciudades de Argentina.">
+<meta name="theme-color" content="#0a6b3d">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600&family=Saira+Condensed:wght@500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --verde-vial:#0a6b3d;
+  --verde-vial-osc:#085530;
+  --verde-borde:#f4f6f3;
+  --amarillo:#ffd100;
+  --bg:#f2f3ef;
+  --card:#ffffff;
+  --tinta:#1c2420;
+  --tinta-2:#5a6660;
+  --linea:#d8dcd4;
+  --foco:#0a6b3d;
+  --sombra:0 2px 10px rgba(20,30,25,.08);
+}
+[data-tema="oscuro"]{
+  --bg:#15181b;
+  --card:#1d2125;
+  --tinta:#eceee9;
+  --tinta-2:#9aa39c;
+  --linea:#2c3236;
+  --verde-vial:#0e7a47;
+  --verde-vial-osc:#0a5c36;
+  --sombra:0 2px 12px rgba(0,0,0,.35);
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{-webkit-text-size-adjust:100%}
+body{
+  font-family:'Archivo',system-ui,sans-serif;
+  background:var(--bg);color:var(--tinta);
+  min-height:100vh;
+  transition:background .25s,color .25s;
+}
+.envoltura{max-width:580px;margin:0 auto;padding:18px 16px 48px}
+
+/* ── Cabecera ── */
+header{display:flex;align-items:center;gap:12px;margin-bottom:22px}
+.escudo{
+  width:44px;height:50px;flex:none;
+  background:var(--verde-vial);
+  clip-path:polygon(0 0,100% 0,100% 70%,50% 100%,0 70%);
+  display:grid;place-items:center;
+  color:#fff;font-family:'Saira Condensed';font-weight:700;font-size:17px;
+  letter-spacing:.5px;padding-bottom:10px;
+}
+h1{font-family:'Saira Condensed',sans-serif;font-weight:700;font-size:26px;line-height:1.05;text-transform:uppercase;letter-spacing:.4px}
+.sub{font-size:12.5px;color:var(--tinta-2);margin-top:2px}
+#btnTema{
+  margin-left:auto;flex:none;width:38px;height:38px;border-radius:50%;
+  border:1px solid var(--linea);background:var(--card);color:var(--tinta);
+  font-size:17px;cursor:pointer;
+}
+#btnTema:focus-visible,button:focus-visible,input:focus-visible{outline:2px solid var(--foco);outline-offset:2px}
+
+/* ── Selectores ── */
+.panel{background:var(--card);border:1px solid var(--linea);border-radius:14px;padding:16px;box-shadow:var(--sombra)}
+.campo{position:relative;margin-bottom:10px}
+.campo label{
+  display:block;font-size:11px;font-weight:600;text-transform:uppercase;
+  letter-spacing:1.2px;color:var(--tinta-2);margin-bottom:5px;
+}
+.campo input{
+  width:100%;padding:11px 38px 11px 12px;font:inherit;font-size:16px;
+  border:1.5px solid var(--linea);border-radius:9px;
+  background:var(--bg);color:var(--tinta);
+}
+.campo input::placeholder{color:var(--tinta-2);opacity:.7}
+.borrar{
+  position:absolute;right:8px;bottom:7px;width:28px;height:28px;border:none;
+  background:transparent;color:var(--tinta-2);font-size:16px;cursor:pointer;border-radius:50%;
+  display:none;
+}
+.campo.lleno .borrar{display:block}
+.sugerencias{
+  position:absolute;z-index:30;left:0;right:0;top:calc(100% + 4px);
+  background:var(--card);border:1px solid var(--linea);border-radius:10px;
+  box-shadow:var(--sombra);max-height:264px;overflow-y:auto;display:none;
+}
+.sugerencias.abierta{display:block}
+.sugerencias div{padding:10px 12px;font-size:15px;cursor:pointer;border-bottom:1px solid var(--linea)}
+.sugerencias div:last-child{border-bottom:none}
+.sugerencias div.activa,.sugerencias div:hover{background:var(--verde-vial);color:#fff}
+.fila-intercambio{display:flex;justify-content:center;margin:2px 0 10px}
+#btnInvertir{
+  border:1px solid var(--linea);background:var(--bg);color:var(--tinta);
+  width:40px;height:40px;border-radius:50%;font-size:18px;cursor:pointer;
+  transition:transform .25s;
+}
+#btnInvertir:active{transform:rotate(180deg)}
+
+/* ── Cartel resultado ── */
+#resultado{display:none;margin-top:20px}
+.cartel{
+  background:var(--verde-vial);
+  border-radius:14px;padding:8px;
+  box-shadow:var(--sombra);
+}
+.cartel-interno{
+  border:3px solid var(--verde-borde);border-radius:9px;
+  padding:16px 16px 14px;color:#fff;
+}
+.cartel-ruta{
+  font-family:'Saira Condensed';font-weight:600;font-size:13px;
+  text-transform:uppercase;letter-spacing:2px;opacity:.85;margin-bottom:8px;
+}
+.cartel-fila{
+  display:flex;align-items:baseline;justify-content:space-between;gap:14px;
+}
+.cartel-destino{
+  font-family:'Saira Condensed';font-weight:700;font-size:clamp(24px,6.4vw,34px);
+  text-transform:uppercase;line-height:1.05;letter-spacing:.5px;
+}
+.cartel-km{
+  font-family:'Saira Condensed';font-weight:700;font-size:clamp(26px,7vw,38px);
+  white-space:nowrap;
+}
+.cartel-km small{font-size:.45em;font-weight:600;letter-spacing:1px}
+.cartel-tiempo{
+  display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;
+  margin-top:12px;padding-top:11px;border-top:1.5px dashed rgba(255,255,255,.4);
+  font-family:'Saira Condensed';font-weight:600;font-size:17px;letter-spacing:.4px;
+}
+.cartel-tiempo span b{font-weight:700}
+
+/* aviso asimetría */
+.aviso{
+  display:none;align-items:flex-start;gap:10px;margin-top:12px;
+  background:var(--amarillo);color:#211c00;border-radius:10px;
+  padding:10px 12px;font-size:13.5px;line-height:1.45;
+}
+.aviso.visible{display:flex}
+.aviso .rombo{flex:none;width:16px;height:16px;background:#211c00;transform:rotate(45deg) scale(.78);margin-top:3px;border-radius:2px}
+
+/* ── Cercanas ── */
+#cercanas{display:none;margin-top:22px}
+#cercanas h2{
+  font-family:'Saira Condensed';font-weight:600;font-size:15px;text-transform:uppercase;
+  letter-spacing:1.6px;color:var(--tinta-2);margin-bottom:9px;
+}
+.mini{
+  display:flex;justify-content:space-between;align-items:baseline;gap:10px;
+  background:var(--card);border:1px solid var(--linea);border-radius:9px;
+  padding:9px 13px;margin-bottom:6px;cursor:pointer;font-size:14.5px;
+  transition:border-color .15s;
+}
+.mini:hover{border-color:var(--verde-vial)}
+.mini b{font-family:'Saira Condensed';font-weight:700;font-size:16px;white-space:nowrap}
+.mini .t{color:var(--tinta-2);font-size:12.5px;white-space:nowrap}
+
+footer{margin-top:34px;font-size:11.5px;color:var(--tinta-2);text-align:center;line-height:1.6}
+#estado{margin-top:16px;font-size:13.5px;color:var(--tinta-2);text-align:center}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+</head>
+<body>
+<div class="envoltura">
+
+  <header>
+    <div class="escudo" aria-hidden="true">RN</div>
+    <div>
+      <h1>¿A cuánto queda?</h1>
+      <div class="sub">Distancias y tiempos por ruta · 751 ciudades argentinas</div>
+    </div>
+    <button id="btnTema" title="Cambiar tema" aria-label="Cambiar tema">◐</button>
+  </header>
+
+  <div class="panel">
+    <div class="campo" id="campoO">
+      <label for="inO">Origen</label>
+      <input id="inO" type="text" placeholder="Escribí una ciudad…" autocomplete="off" spellcheck="false">
+      <button class="borrar" aria-label="Borrar origen">✕</button>
+      <div class="sugerencias" role="listbox"></div>
+    </div>
+    <div class="fila-intercambio">
+      <button id="btnInvertir" title="Invertir origen y destino" aria-label="Invertir origen y destino">⇅</button>
+    </div>
+    <div class="campo" id="campoD">
+      <label for="inD">Destino</label>
+      <input id="inD" type="text" placeholder="¿A dónde vas?" autocomplete="off" spellcheck="false">
+      <button class="borrar" aria-label="Borrar destino">✕</button>
+      <div class="sugerencias" role="listbox"></div>
+    </div>
+  </div>
+
+  <div id="estado">Cargando matriz de distancias…</div>
+
+  <div id="resultado">
+    <div class="cartel">
+      <div class="cartel-interno">
+        <div class="cartel-ruta" id="cRuta"></div>
+        <div class="cartel-fila">
+          <div class="cartel-destino" id="cDestino"></div>
+          <div class="cartel-km" id="cKm"></div>
+        </div>
+        <div class="cartel-tiempo">
+          <span id="cTiempo"></span>
+          <span id="cVel"></span>
+        </div>
+      </div>
+    </div>
+    <div class="aviso" id="aviso">
+      <div class="rombo"></div>
+      <div id="avisoTxt"></div>
+    </div>
+  </div>
+
+  <div id="cercanas">
+    <h2 id="cercanasTitulo"></h2>
+    <div id="cercanasLista"></div>
+  </div>
+
+  <footer>
+    Distancias y tiempos estimados por ruta — pueden variar según el estado de los caminos.<br>
+    v1 · Datos: matriz 751×751 direccional
+  </footer>
+</div>
+
+<script src="ciudades.js"></script>
+<script>
+(function(){
+'use strict';
+let KM=null, MIN=null;            // Uint16Array N*N (km*10 / minutos)
+let idxO=-1, idxD=-1;
+const $=s=>document.querySelector(s);
+const fmt=new Intl.NumberFormat('es-AR',{maximumFractionDigits:1});
+
+/* ── tema ── */
+const temaGuardado=localStorage.getItem('acq_tema');
+if(temaGuardado) document.documentElement.dataset.tema=temaGuardado;
+else if(matchMedia('(prefers-color-scheme: dark)').matches) document.documentElement.dataset.tema='oscuro';
+$('#btnTema').addEventListener('click',()=>{
+  const t=document.documentElement.dataset.tema==='oscuro'?'claro':'oscuro';
+  document.documentElement.dataset.tema=t;
+  localStorage.setItem('acq_tema',t);
+});
+
+/* ── datos ── */
+fetch('data.bin').then(r=>{
+  if(!r.ok) throw new Error(r.status);
+  return r.arrayBuffer();
+}).then(buf=>{
+  const n=N_CIUDADES*N_CIUDADES;
+  KM=new Uint16Array(buf,0,n);
+  MIN=new Uint16Array(buf,n*2,n);
+  $('#estado').textContent='Elegí origen y destino para ver la distancia.';
+  leerHash();
+}).catch(()=>{
+  $('#estado').textContent='No se pudo cargar data.bin — verificá que esté junto a index.html.';
+});
+
+/* ── utilidades ── */
+const norm=s=>s.normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase();
+const NOMBRES_NORM=CIUDADES.map(norm);
+function km(i,j){return KM[i*N_CIUDADES+j]/10;}
+function min(i,j){return MIN[i*N_CIUDADES+j];}
+function fmtTiempo(m){
+  const h=Math.floor(m/60), r=m%60;
+  return h? h+' h '+String(r).padStart(2,'0')+' min' : r+' min';
+}
+
+/* ── autocompletado ── */
+function armarCampo(campo, alElegir){
+  const input=campo.querySelector('input');
+  const lista=campo.querySelector('.sugerencias');
+  const btnX=campo.querySelector('.borrar');
+  let items=[], activa=-1;
+
+  function cerrar(){lista.classList.remove('abierta');activa=-1;}
+  function filtrar(){
+    const q=norm(input.value.trim());
+    lista.innerHTML='';items=[];activa=-1;
+    if(q.length<1){cerrar();return;}
+    for(let i=0;i<CIUDADES.length && items.length<12;i++){
+      if(NOMBRES_NORM[i].includes(q)) items.push(i);
+    }
+    // priorizar las que empiezan con la búsqueda
+    items.sort((a,b)=>NOMBRES_NORM[a].startsWith(q)===NOMBRES_NORM[b].startsWith(q)
+      ?CIUDADES[a].localeCompare(CIUDADES[b],'es')
+      :(NOMBRES_NORM[a].startsWith(q)?-1:1));
+    if(!items.length){cerrar();return;}
+    items.forEach((ci,k)=>{
+      const d=document.createElement('div');
+      d.textContent=CIUDADES[ci];
+      d.setAttribute('role','option');
+      d.addEventListener('mousedown',e=>{e.preventDefault();elegir(k);});
+      lista.appendChild(d);
+    });
+    lista.classList.add('abierta');
+  }
+  function elegir(k){
+    const ci=items[k];
+    input.value=CIUDADES[ci];
+    campo.classList.add('lleno');
+    cerrar();
+    alElegir(ci);
+  }
+  function marcar(){
+    [...lista.children].forEach((d,k)=>d.classList.toggle('activa',k===activa));
+    if(activa>=0) lista.children[activa].scrollIntoView({block:'nearest'});
+  }
+  input.addEventListener('input',()=>{
+    campo.classList.toggle('lleno',!!input.value);
+    alElegir(-1);
+    filtrar();
+  });
+  input.addEventListener('keydown',e=>{
+    if(!lista.classList.contains('abierta')) return;
+    if(e.key==='ArrowDown'){e.preventDefault();activa=Math.min(activa+1,items.length-1);marcar();}
+    else if(e.key==='ArrowUp'){e.preventDefault();activa=Math.max(activa-1,0);marcar();}
+    else if(e.key==='Enter'){e.preventDefault();elegir(activa>=0?activa:0);}
+    else if(e.key==='Escape'){cerrar();}
+  });
+  input.addEventListener('blur',()=>setTimeout(cerrar,120));
+  btnX.addEventListener('click',()=>{
+    input.value='';campo.classList.remove('lleno');alElegir(-1);input.focus();
+  });
+  return {
+    set(ci){input.value=ci>=0?CIUDADES[ci]:'';campo.classList.toggle('lleno',ci>=0);}
+  };
+}
+
+const ctrlO=armarCampo($('#campoO'),ci=>{idxO=ci;refrescar();});
+const ctrlD=armarCampo($('#campoD'),ci=>{idxD=ci;refrescar();});
+
+$('#btnInvertir').addEventListener('click',()=>{
+  [idxO,idxD]=[idxD,idxO];
+  ctrlO.set(idxO);ctrlD.set(idxD);
+  refrescar();
+});
+
+/* ── render ── */
+function refrescar(){
+  const res=$('#resultado'), cer=$('#cercanas'), est=$('#estado');
+  if(!KM){return;}
+  // cercanas: con solo origen ya se pueden mostrar
+  if(idxO>=0){renderCercanas(idxO);}else{cer.style.display='none';}
+  if(idxO<0||idxD<0||idxO===idxD){
+    res.style.display='none';
+    est.style.display='block';
+    est.textContent=idxO===idxD&&idxO>=0?'El origen y el destino son la misma ciudad.':'Elegí origen y destino para ver la distancia.';
+    actualizarHash();
+    return;
+  }
+  est.style.display='none';
+  const d1=km(idxO,idxD), t1=min(idxO,idxD);
+  const d2=km(idxD,idxO), t2=min(idxD,idxO);
+  $('#cRuta').textContent='Desde '+CIUDADES[idxO];
+  $('#cDestino').textContent=CIUDADES[idxD];
+  $('#cKm').innerHTML=fmt.format(d1)+' <small>KM</small>';
+  $('#cTiempo').innerHTML='🕐 <b>'+fmtTiempo(t1)+'</b>';
+  $('#cVel').innerHTML='⌀ <b>'+Math.round(d1/(t1/60))+' km/h</b>';
+  const aviso=$('#aviso');
+  if(Math.abs(d1-d2)>5){
+    aviso.classList.add('visible');
+    $('#avisoTxt').innerHTML='La vuelta difiere: <b>'+CIUDADES[idxD]+' → '+CIUDADES[idxO]+
+      '</b> son <b>'+fmt.format(d2)+' km</b> ('+fmtTiempo(t2)+'). El trazado recomendado cambia según el sentido.';
+  }else{
+    aviso.classList.remove('visible');
+  }
+  res.style.display='block';
+  actualizarHash();
+}
+
+function renderCercanas(o){
+  const cer=$('#cercanas');
+  const idx=[];
+  for(let j=0;j<N_CIUDADES;j++) if(j!==o) idx.push(j);
+  idx.sort((a,b)=>KM[o*N_CIUDADES+a]-KM[o*N_CIUDADES+b]);
+  const top=idx.slice(0,10);
+  $('#cercanasTitulo').textContent='Más cercanas a '+CIUDADES[o];
+  const cont=$('#cercanasLista');
+  cont.innerHTML='';
+  top.forEach(j=>{
+    const d=document.createElement('div');
+    d.className='mini';
+    d.innerHTML='<span>'+CIUDADES[j]+'</span><span class="t">'+fmtTiempo(min(o,j))+'</span><b>'+fmt.format(km(o,j))+' km</b>';
+    d.addEventListener('click',()=>{idxD=j;ctrlD.set(j);refrescar();window.scrollTo({top:0,behavior:'smooth'});});
+    cont.appendChild(d);
+  });
+  cer.style.display='block';
+}
+
+/* ── estado en URL (#o=12&d=345) ── */
+function actualizarHash(){
+  const p=[];
+  if(idxO>=0)p.push('o='+idxO);
+  if(idxD>=0)p.push('d='+idxD);
+  history.replaceState(null,'',p.length?'#'+p.join('&'):location.pathname);
+}
+function leerHash(){
+  const m=Object.fromEntries(location.hash.slice(1).split('&').filter(Boolean).map(x=>x.split('=')));
+  const o=parseInt(m.o), d=parseInt(m.d);
+  if(o>=0&&o<N_CIUDADES){idxO=o;ctrlO.set(o);}
+  if(d>=0&&d<N_CIUDADES){idxD=d;ctrlD.set(d);}
+  refrescar();
+}
+})();
+</script>
+</body>
+</html>
