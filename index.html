@@ -21,23 +21,23 @@
   --verde-vial-osc:#085530;
   --verde-borde:#f4f6f3;
   --amarillo:#ffd100;
-  /* paleta "De Cuestas, Abras y Quebradas" — parch/leather/ink */
-  --bg:#F2E8CC;        /* parch */
-  --card:#FAF4E4;      /* parch-light */
-  --tinta:#2A1A0A;     /* ink */
-  --tinta-2:#8A6A50;   /* ink-lt */
-  --linea:rgba(160,85,42,.18); /* border */
-  --acento:#A0552A;    /* leather */
+  /* paleta "De Cuestas, Abras y Quebradas" — valores verificados por DevTools (v6) */
+  --bg:#E8D880;        /* parch — fondo real del body en De Cuestas */
+  --card:#F2E8CC;      /* parch-light — antes usado como --bg */
+  --tinta:#1E1008;     /* ink */
+  --tinta-2:#7A5A38;   /* ink-lt */
+  --linea:rgba(90,58,26,.22); /* border */
+  --acento:#A0552A;    /* bronze */
   --acento-claro:#C8845A; /* bronze-lt */
   --foco:#0a6b3d;
   --sombra:0 2px 10px rgba(20,30,25,.08);
 }
 [data-tema="oscuro"]{
-  --bg:#1C130A;
-  --card:#2A1A0A;      /* ink */
-  --tinta:#F2E8CC;     /* parch */
-  --tinta-2:#D4C080;   /* parch-dk */
-  --linea:rgba(242,232,204,.14);
+  --bg:#1E1008;        /* ink */
+  --card:#4A1E08;      /* leather-dk */
+  --tinta:#F2E8CC;     /* parch-light */
+  --tinta-2:#C8A878;
+  --linea:rgba(232,216,128,.16);
   --acento:#C8845A;    /* bronze-lt */
   --acento-claro:#E0AC82;
   --verde-vial:#0e7a47;
@@ -378,7 +378,7 @@ footer{margin-top:34px;font-size:11.5px;color:var(--tinta-2);text-align:center;l
 
   <footer>
     Distancias y tiempos estimados por ruta — pueden variar según el estado de los caminos.<br>
-    v5 · By Meteoro405
+    v6 · By Meteoro405
     <div><button id="btnInstalar" class="link-instalar">📲 Instalar app</button></div>
   </footer>
 </div>

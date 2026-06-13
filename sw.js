@@ -1,6 +1,6 @@
 // ¿A cuánto queda? — Service Worker
 // Incrementar CACHE en cada versión (acq-vN)
-const CACHE = 'acq-v5';
+const CACHE = 'acq-v6';
 const ARCHIVOS = [
   './',
   './index.html',
