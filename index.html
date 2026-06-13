@@ -6,6 +6,12 @@
 <title>¿A cuánto queda? — By Meteoro405</title>
 <meta name="description" content="Distancia por ruta y tiempo de viaje entre 751 ciudades de Argentina.">
 <meta name="theme-color" content="#0a6b3d">
+<link rel="manifest" href="manifest.json">
+<link rel="icon" href="icons/favicon.png" type="image/png">
+<link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="A cuánto queda">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600&family=Saira+Condensed:wght@500;600;700&display=swap" rel="stylesheet">
@@ -133,6 +139,22 @@ h1{font-family:'Saira Condensed',sans-serif;font-weight:700;font-size:26px;line-
 }
 .cartel-tiempo span b{font-weight:700}
 
+/* acciones: Maps / WhatsApp */
+.acciones{display:flex;gap:8px;margin-top:20px}
+.accion{
+  flex:1;display:flex;align-items:center;justify-content:center;gap:7px;
+  padding:11px 10px;border-radius:9px;border:1.5px solid var(--linea);
+  background:var(--card);color:var(--tinta);text-decoration:none;
+  font-family:'Archivo';font-weight:600;font-size:13.5px;
+  transition:border-color .15s,transform .1s;
+}
+.accion:active{transform:scale(.97)}
+.accion svg{width:17px;height:17px;flex:none}
+.accion.maps:hover{border-color:#4285F4}
+.accion.wsp{border-color:#25D36655;color:#1f7a52}
+.accion.wsp:hover{border-color:#25D366}
+[data-tema="oscuro"] .accion.wsp{color:#3ddc97}
+
 /* aviso asimetría */
 .aviso{
   display:none;align-items:flex-start;gap:10px;margin-top:12px;
@@ -159,6 +181,26 @@ h1{font-family:'Saira Condensed',sans-serif;font-weight:700;font-size:26px;line-
 .mini .t{color:var(--tinta-2);font-size:12.5px;white-space:nowrap}
 
 footer{margin-top:34px;font-size:11.5px;color:var(--tinta-2);text-align:center;line-height:1.6}
+.link-instalar{
+  margin-top:10px;border:1px solid var(--linea);background:var(--card);color:var(--tinta-2);
+  font:inherit;font-size:12px;font-weight:600;padding:7px 14px;border-radius:20px;cursor:pointer;
+}
+.link-instalar:hover{color:var(--tinta);border-color:var(--verde-vial)}
+
+/* banner de instalación */
+.instalar-banner{
+  display:none;margin-top:18px;background:var(--card);border:1.5px solid var(--verde-vial);
+  border-radius:12px;padding:12px 14px;font-size:13.5px;line-height:1.45;
+  align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;
+}
+.instalar-banner.visible{display:flex}
+.instalar-banner-bot{display:flex;gap:8px;flex:none}
+.instalar-banner-bot button{
+  font:inherit;font-weight:600;font-size:13px;border-radius:7px;cursor:pointer;padding:7px 13px;
+}
+#btnInstalarSi{background:var(--verde-vial);color:#fff;border:none}
+#btnInstalarNo{background:transparent;color:var(--tinta-2);border:1px solid var(--linea)}
+
 #estado{margin-top:16px;font-size:13.5px;color:var(--tinta-2);text-align:center}
 @media (prefers-reduced-motion:reduce){*{transition:none!important}}
 </style>
@@ -214,6 +256,16 @@ footer{margin-top:34px;font-size:11.5px;color:var(--tinta-2);text-align:center;l
       <div class="rombo"></div>
       <div id="avisoTxt"></div>
     </div>
+    <div class="acciones">
+      <a class="accion maps" id="lnkMaps" target="_blank" rel="noopener">
+        <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2C8.13 2 5 5.13 5 9c0 4.17 4.42 9.92 6.24 12.11a1 1 0 0 0 1.52 0C14.58 18.92 19 13.17 19 9c0-3.87-3.13-7-7-7zm0 9.5A2.5 2.5 0 1 1 12 6.5a2.5 2.5 0 0 1 0 5z"/></svg>
+        Ver en Maps
+      </a>
+      <a class="accion wsp" id="lnkWsp" target="_blank" rel="noopener">
+        <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2a10 10 0 0 0-8.6 15.1L2 22l5.06-1.33A10 10 0 1 0 12 2zm0 18a8 8 0 0 1-4.08-1.12l-.29-.17-3 .79.8-2.93-.19-.3A8 8 0 1 1 12 20zm4.4-5.6c-.24-.12-1.43-.7-1.65-.78-.22-.08-.38-.12-.54.12-.16.24-.62.78-.76.94-.14.16-.28.18-.52.06-.24-.12-1-.37-1.9-1.17-.7-.62-1.18-1.39-1.32-1.63-.14-.24-.01-.37.11-.49.12-.12.27-.31.4-.47.13-.16.18-.27.27-.45.09-.18.05-.33-.03-.45-.08-.12-.5-1.2-.68-1.65-.18-.43-.36-.37-.5-.38-.13-.01-.28-.01-.43-.01-.15 0-.39.06-.6.3-.21.24-.8.78-.8 1.9 0 1.12.82 2.2 .93 2.35.11.15 1.55 2.37 3.76 3.23 2.21.86 2.21.58 2.61.54.4-.04 1.43-.58 1.63-1.14.2-.56.2-1.04.14-1.14-.06-.1-.22-.16-.46-.28z"/></svg>
+        Enviar por WhatsApp
+      </a>
+    </div>
   </div>
 
   <div id="cercanas">
@@ -221,9 +273,18 @@ footer{margin-top:34px;font-size:11.5px;color:var(--tinta-2);text-align:center;l
     <div id="cercanasLista"></div>
   </div>
 
+  <div id="instalarBanner" class="instalar-banner">
+    <span>📲 Instalá <b>¿A cuánto queda?</b> para usarla sin conexión.</span>
+    <div class="instalar-banner-bot">
+      <button id="btnInstalarSi">Instalar</button>
+      <button id="btnInstalarNo">Ahora no</button>
+    </div>
+  </div>
+
   <footer>
     Distancias y tiempos estimados por ruta — pueden variar según el estado de los caminos.<br>
-    v2 · By Meteoro405
+    v3 · By Meteoro405
+    <div><button id="btnInstalar" class="link-instalar">📲 Instalar app</button></div>
   </footer>
 </div>
 
@@ -268,6 +329,11 @@ function min(i,j){return MIN[i*N_CIUDADES+j];}
 function fmtTiempo(m){
   const h=Math.floor(m/60), r=m%60;
   return h? h+' h '+String(r).padStart(2,'0')+' min' : r+' min';
+}
+// "Mercedes (Corrientes)" -> "Mercedes, Corrientes, Argentina"
+function paraMaps(nombre){
+  const m=nombre.match(/^(.*) \((.*)\)$/);
+  return m? `${m[1]}, ${m[2]}, Argentina` : `${nombre}, Argentina`;
 }
 
 /* ── autocompletado ── */
@@ -370,6 +436,17 @@ function refrescar(){
     aviso.classList.remove('visible');
   }
   res.style.display='block';
+
+  const origenN=CIUDADES[idxO], destinoN=CIUDADES[idxD];
+  $('#lnkMaps').href='https://www.google.com/maps/dir/?api=1&origin='+
+    encodeURIComponent(paraMaps(origenN))+'&destination='+encodeURIComponent(paraMaps(destinoN))+'&travelmode=driving';
+
+  const enlace=location.origin+location.pathname+'#o='+idxO+'&d='+idxD;
+  const msj='🛣️ '+origenN+' → '+destinoN+'\n'+
+    fmt.format(d1)+' km · '+fmtTiempo(t1)+'\n'+
+    enlace;
+  $('#lnkWsp').href='https://wa.me/?text='+encodeURIComponent(msj);
+
   actualizarHash();
 }
 
@@ -406,6 +483,56 @@ function leerHash(){
   if(d>=0&&d<N_CIUDADES){idxD=d;ctrlD.set(d);}
   refrescar();
 }
+
+/* ── instalación PWA ── */
+if('serviceWorker' in navigator){
+  window.addEventListener('load',()=>navigator.serviceWorker.register('sw.js').catch(()=>{}));
+}
+
+const yaInstalada = matchMedia('(display-mode: standalone)').matches || navigator.standalone===true;
+const esIOS = /iphone|ipad|ipod/i.test(navigator.userAgent) && !window.MSStream;
+let promptDiferido = null;
+
+const banner=$('#instalarBanner'), btnInstalar=$('#btnInstalar');
+
+if(yaInstalada){
+  btnInstalar.style.display='none';
+}
+
+window.addEventListener('beforeinstallprompt', e=>{
+  e.preventDefault();
+  promptDiferido = e;
+  if(!yaInstalada && !sessionStorage.getItem('acq_instalar_oculto')){
+    banner.classList.add('visible');
+  }
+});
+
+window.addEventListener('appinstalled', ()=>{
+  promptDiferido = null;
+  banner.classList.remove('visible');
+  btnInstalar.style.display='none';
+});
+
+async function pedirInstalacion(){
+  if(promptDiferido){
+    promptDiferido.prompt();
+    const r = await promptDiferido.userChoice;
+    if(r.outcome==='accepted'){ banner.classList.remove('visible'); }
+    promptDiferido = null;
+  }else if(esIOS){
+    alert('Para instalarla: tocá el botón Compartir ⬆️ de Safari y elegí "Agregar a pantalla de inicio".');
+  }else{
+    alert('Para instalarla, buscá la opción "Instalar app" o "Agregar a pantalla de inicio" en el menú del navegador (⋮).');
+  }
+}
+
+$('#btnInstalarSi').addEventListener('click', pedirInstalacion);
+$('#btnInstalarNo').addEventListener('click', ()=>{
+  banner.classList.remove('visible');
+  sessionStorage.setItem('acq_instalar_oculto','1');
+});
+btnInstalar.addEventListener('click', pedirInstalacion);
+
 })();
 </script>
 </body>
