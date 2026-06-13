@@ -1,6 +1,6 @@
 // ¿A cuánto queda? — Service Worker
 // Incrementar CACHE en cada versión (acq-vN)
-const CACHE = 'acq-v3';
+const CACHE = 'acq-v4';
 const ARCHIVOS = [
   './',
   './index.html',
@@ -14,7 +14,11 @@ const ARCHIVOS = [
 
 self.addEventListener('install', e => {
   e.waitUntil(
-    caches.open(CACHE).then(cache => cache.addAll(ARCHIVOS)).then(() => self.skipWaiting())
+    caches.open(CACHE).then(cache =>
+      Promise.all(ARCHIVOS.map(url =>
+        fetch(url, { cache: 'reload' }).then(resp => cache.put(url, resp)).catch(() => {})
+      ))
+    ).then(() => self.skipWaiting())
   );
 });
 

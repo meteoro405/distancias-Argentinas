@@ -150,10 +150,69 @@ h1{font-family:'Saira Condensed',sans-serif;font-weight:700;font-size:26px;line-
 }
 .accion:active{transform:scale(.97)}
 .accion svg{width:17px;height:17px;flex:none}
+.accion.maps{cursor:pointer}
 .accion.maps:hover{border-color:#4285F4}
 .accion.wsp{border-color:#25D36655;color:#1f7a52}
 .accion.wsp:hover{border-color:#25D366}
 [data-tema="oscuro"] .accion.wsp{color:#3ddc97}
+
+/* modal de mapa */
+.modal-overlay{
+  display:none;position:fixed;inset:0;z-index:100;
+  background:rgba(0,0,0,.55);
+  align-items:center;justify-content:center;padding:14px;
+}
+.modal-overlay.visible{display:flex}
+.modal-caja{
+  background:var(--card);border-radius:14px;overflow:hidden;
+  width:100%;max-width:560px;max-height:88vh;
+  display:flex;flex-direction:column;box-shadow:var(--sombra);
+}
+.modal-cabecera{
+  display:flex;align-items:center;justify-content:space-between;gap:10px;
+  padding:11px 14px;font-family:'Saira Condensed';font-weight:600;font-size:15px;
+  text-transform:uppercase;letter-spacing:.5px;border-bottom:1px solid var(--linea);
+}
+.modal-cerrar{
+  border:none;background:transparent;color:var(--tinta-2);font-size:18px;cursor:pointer;
+  width:30px;height:30px;border-radius:50%;flex:none;
+}
+.modal-cerrar:hover{background:var(--bg);color:var(--tinta)}
+#mapaFrame{width:100%;height:min(60vh,420px);border:0;display:block;background:var(--bg)}
+.modal-fallback{margin:10px 12px 12px;border-radius:9px}
+
+/* panel de costo de viaje */
+.costo{margin-top:14px;padding-top:13px;border-top:1px solid var(--linea)}
+.costo-toggle{
+  width:100%;display:flex;align-items:center;justify-content:space-between;
+  background:transparent;border:none;color:var(--tinta);cursor:pointer;
+  font-family:'Archivo';font-weight:600;font-size:13.5px;padding:6px 0;
+}
+.costo-flecha{transition:transform .2s;color:var(--tinta-2)}
+.costo-toggle[aria-expanded="true"] .costo-flecha{transform:rotate(180deg)}
+.costo-cuerpo{display:none;margin-top:6px}
+.costo-cuerpo.abierto{display:block}
+.costo-fila{display:flex;gap:8px;flex-wrap:wrap}
+.campo-mini{flex:1;min-width:88px}
+.campo-mini label{
+  display:block;font-size:10px;font-weight:600;text-transform:uppercase;
+  letter-spacing:1px;color:var(--tinta-2);margin-bottom:4px;
+}
+.campo-mini input,.campo-mini select{
+  width:100%;padding:8px 9px;font:inherit;font-size:14px;
+  border:1.5px solid var(--linea);border-radius:8px;
+  background:var(--bg);color:var(--tinta);
+}
+.campo-mini input::placeholder{color:var(--tinta-2);opacity:.7}
+.costo-resultado{
+  margin-top:10px;font-family:'Saira Condensed';font-weight:700;font-size:18px;
+  color:var(--verde-vial);min-height:24px;
+}
+[data-tema="oscuro"] .costo-resultado{color:#3ddc97}
+.costo-resultado b{font-size:1.15em}
+.costo-nota{margin-top:8px;font-size:11px;color:var(--tinta-2);line-height:1.45}
+.costo-nota a{color:var(--verde-vial);text-decoration:underline}
+[data-tema="oscuro"] .costo-nota a{color:#3ddc97}
 
 /* aviso asimetría */
 .aviso{
@@ -257,14 +316,47 @@ footer{margin-top:34px;font-size:11.5px;color:var(--tinta-2);text-align:center;l
       <div id="avisoTxt"></div>
     </div>
     <div class="acciones">
-      <a class="accion maps" id="lnkMaps" target="_blank" rel="noopener">
+      <button class="accion maps" id="btnMaps" type="button">
         <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2C8.13 2 5 5.13 5 9c0 4.17 4.42 9.92 6.24 12.11a1 1 0 0 0 1.52 0C14.58 18.92 19 13.17 19 9c0-3.87-3.13-7-7-7zm0 9.5A2.5 2.5 0 1 1 12 6.5a2.5 2.5 0 0 1 0 5z"/></svg>
         Ver en Maps
-      </a>
+      </button>
       <a class="accion wsp" id="lnkWsp" target="_blank" rel="noopener">
         <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2a10 10 0 0 0-8.6 15.1L2 22l5.06-1.33A10 10 0 1 0 12 2zm0 18a8 8 0 0 1-4.08-1.12l-.29-.17-3 .79.8-2.93-.19-.3A8 8 0 1 1 12 20zm4.4-5.6c-.24-.12-1.43-.7-1.65-.78-.22-.08-.38-.12-.54.12-.16.24-.62.78-.76.94-.14.16-.28.18-.52.06-.24-.12-1-.37-1.9-1.17-.7-.62-1.18-1.39-1.32-1.63-.14-.24-.01-.37.11-.49.12-.12.27-.31.4-.47.13-.16.18-.27.27-.45.09-.18.05-.33-.03-.45-.08-.12-.5-1.2-.68-1.65-.18-.43-.36-.37-.5-.38-.13-.01-.28-.01-.43-.01-.15 0-.39.06-.6.3-.21.24-.8.78-.8 1.9 0 1.12.82 2.2 .93 2.35.11.15 1.55 2.37 3.76 3.23 2.21.86 2.21.58 2.61.54.4-.04 1.43-.58 1.63-1.14.2-.56.2-1.04.14-1.14-.06-.1-.22-.16-.46-.28z"/></svg>
         Enviar por WhatsApp
       </a>
+    </div>
+
+    <div class="costo">
+      <button class="costo-toggle" id="costoToggle" type="button" aria-expanded="false">
+        <span>⛽ Calcular costo del viaje</span><span class="costo-flecha">▾</span>
+      </button>
+      <div class="costo-cuerpo" id="costoCuerpo">
+        <div class="costo-fila">
+          <div class="campo-mini">
+            <label for="inConsumo">Consumo (cada 100 km)</label>
+            <input type="number" id="inConsumo" min="1" max="60" step="0.5" inputmode="decimal">
+          </div>
+          <div class="campo-mini">
+            <label for="inCombustible">Combustible</label>
+            <select id="inCombustible">
+              <option value="nafta">Nafta</option>
+              <option value="nafta_premium">Nafta premium</option>
+              <option value="gasoil">Gasoil</option>
+              <option value="gasoil_premium">Gasoil premium</option>
+              <option value="gnc">GNC</option>
+            </select>
+          </div>
+          <div class="campo-mini">
+            <label for="inPrecio" id="lblPrecio">Precio ($/L)</label>
+            <input type="number" id="inPrecio" min="0" step="1" inputmode="decimal" placeholder="0">
+          </div>
+        </div>
+        <div class="costo-resultado" id="costoResultado"></div>
+        <div class="costo-nota">
+          Estimación según tu consumo declarado. Para precios de referencia: 
+          <a href="https://res1104.se.gob.ar/consultaprecios.eess.php" target="_blank" rel="noopener">consulta oficial de precios</a>.
+        </div>
+      </div>
     </div>
   </div>
 
@@ -283,9 +375,22 @@ footer{margin-top:34px;font-size:11.5px;color:var(--tinta-2);text-align:center;l
 
   <footer>
     Distancias y tiempos estimados por ruta — pueden variar según el estado de los caminos.<br>
-    v3 · By Meteoro405
+    v4 · By Meteoro405
     <div><button id="btnInstalar" class="link-instalar">📲 Instalar app</button></div>
   </footer>
+</div>
+
+<div class="modal-overlay" id="mapaModal">
+  <div class="modal-caja">
+    <div class="modal-cabecera">
+      <span id="mapaTitulo"></span>
+      <button class="modal-cerrar" id="mapaCerrar" aria-label="Cerrar mapa">✕</button>
+    </div>
+    <iframe id="mapaFrame" loading="lazy" referrerpolicy="no-referrer-when-downgrade" allowfullscreen></iframe>
+    <a class="accion maps modal-fallback" id="mapaFallback" target="_blank" rel="noopener">
+      Abrir en Google Maps
+    </a>
+  </div>
 </div>
 
 <script src="ciudades.js"></script>
@@ -406,12 +511,14 @@ $('#btnInvertir').addEventListener('click',()=>{
   refrescar();
 });
 
+let distActual=0, tiempoActual=0, origenActual='', destinoActual='';
+
 /* ── render ── */
 function refrescar(){
   const res=$('#resultado'), cer=$('#cercanas'), est=$('#estado');
   if(!KM){return;}
-  // cercanas: con solo origen ya se pueden mostrar
-  if(idxO>=0){renderCercanas(idxO);}else{cer.style.display='none';}
+  // cercanas: solo mientras no haya un destino válido elegido
+  if(idxO>=0 && (idxD<0 || idxD===idxO)){renderCercanas(idxO);}else{cer.style.display='none';}
   if(idxO<0||idxD<0||idxO===idxD){
     res.style.display='none';
     est.style.display='block';
@@ -437,15 +544,10 @@ function refrescar(){
   }
   res.style.display='block';
 
-  const origenN=CIUDADES[idxO], destinoN=CIUDADES[idxD];
-  $('#lnkMaps').href='https://www.google.com/maps/dir/?api=1&origin='+
-    encodeURIComponent(paraMaps(origenN))+'&destination='+encodeURIComponent(paraMaps(destinoN))+'&travelmode=driving';
-
-  const enlace=location.origin+location.pathname+'#o='+idxO+'&d='+idxD;
-  const msj='🛣️ '+origenN+' → '+destinoN+'\n'+
-    fmt.format(d1)+' km · '+fmtTiempo(t1)+'\n'+
-    enlace;
-  $('#lnkWsp').href='https://wa.me/?text='+encodeURIComponent(msj);
+  distActual=d1; tiempoActual=t1;
+  origenActual=CIUDADES[idxO]; destinoActual=CIUDADES[idxD];
+  actualizarWsp();
+  actualizarCosto();
 
   actualizarHash();
 }
@@ -469,7 +571,100 @@ function renderCercanas(o){
   cer.style.display='block';
 }
 
-/* ── estado en URL (#o=12&d=345) ── */
+/* ── WhatsApp ── */
+function actualizarWsp(){
+  const enlace=location.origin+location.pathname+'#o='+idxO+'&d='+idxD;
+  let msj='🛣️ '+origenActual+' → '+destinoActual+'\n'+
+    fmt.format(distActual)+' km · '+fmtTiempo(tiempoActual);
+  const costo=calcularCosto();
+  if(costo) msj+='\n⛽ '+costo.litrosTxt+' · '+costo.costoTxt;
+  msj+='\n'+enlace;
+  $('#lnkWsp').href='https://wa.me/?text='+encodeURIComponent(msj);
+}
+
+/* ── costo de viaje ── */
+const UNIDADES={nafta:'L',nafta_premium:'L',gasoil:'L',gasoil_premium:'L',gnc:'m³'};
+const ARS=new Intl.NumberFormat('es-AR',{style:'currency',currency:'ARS',maximumFractionDigits:0});
+
+function cargarPreferenciasCosto(){
+  const consumo=localStorage.getItem('acq_consumo');
+  const comb=localStorage.getItem('acq_combustible')||'nafta';
+  $('#inConsumo').value=consumo||'10';
+  $('#inCombustible').value=comb;
+  actualizarUnidadPrecio();
+}
+function preciosGuardados(){
+  try{ return JSON.parse(localStorage.getItem('acq_precios')||'{}'); }catch{ return {}; }
+}
+function actualizarUnidadPrecio(){
+  const comb=$('#inCombustible').value;
+  const u=UNIDADES[comb]||'L';
+  $('#lblPrecio').textContent='Precio ($/'+u+')';
+  const precios=preciosGuardados();
+  $('#inPrecio').value=precios[comb]!=null?precios[comb]:'';
+}
+function calcularCosto(){
+  const consumo=parseFloat($('#inConsumo').value);
+  const precio=parseFloat($('#inPrecio').value);
+  if(!distActual || !consumo || consumo<=0) return null;
+  const u=UNIDADES[$('#inCombustible').value]||'L';
+  const litros=distActual*consumo/100;
+  const litrosTxt=fmt.format(litros)+' '+u;
+  if(!precio || precio<=0) return {litrosTxt, costoTxt:null};
+  return {litrosTxt, costoTxt:ARS.format(litros*precio)};
+}
+function actualizarCosto(){
+  const r=calcularCosto();
+  const el=$('#costoResultado');
+  if(!r){ el.textContent=''; return; }
+  el.innerHTML='≈ <b>'+r.litrosTxt+'</b>'+(r.costoTxt?'  ·  ≈ <b>'+r.costoTxt+'</b>':'');
+}
+['input','change'].forEach(ev=>{
+  $('#inConsumo').addEventListener(ev,()=>{
+    localStorage.setItem('acq_consumo',$('#inConsumo').value);
+    actualizarCosto(); actualizarWsp();
+  });
+  $('#inPrecio').addEventListener(ev,()=>{
+    const precios=preciosGuardados();
+    precios[$('#inCombustible').value]=$('#inPrecio').value;
+    localStorage.setItem('acq_precios',JSON.stringify(precios));
+    actualizarCosto(); actualizarWsp();
+  });
+});
+$('#inCombustible').addEventListener('change',()=>{
+  localStorage.setItem('acq_combustible',$('#inCombustible').value);
+  actualizarUnidadPrecio();
+  actualizarCosto(); actualizarWsp();
+});
+cargarPreferenciasCosto();
+
+const costoToggle=$('#costoToggle'), costoCuerpo=$('#costoCuerpo');
+costoToggle.addEventListener('click',()=>{
+  const abierto=costoCuerpo.classList.toggle('abierto');
+  costoToggle.setAttribute('aria-expanded',abierto?'true':'false');
+});
+
+/* ── modal "Ver en Maps" ── */
+const mapaModal=$('#mapaModal'), mapaFrame=$('#mapaFrame'), mapaFallback=$('#mapaFallback');
+function abrirMapa(){
+  const o=paraMaps(origenActual), d=paraMaps(destinoActual);
+  mapaFrame.src='https://maps.google.com/maps?saddr='+encodeURIComponent(o)+
+    '&daddr='+encodeURIComponent(d)+'&output=embed';
+  mapaFallback.href='https://www.google.com/maps/dir/?api=1&origin='+
+    encodeURIComponent(o)+'&destination='+encodeURIComponent(d)+'&travelmode=driving';
+  $('#mapaTitulo').textContent=origenActual+' → '+destinoActual;
+  mapaModal.classList.add('visible');
+}
+function cerrarMapa(){
+  mapaModal.classList.remove('visible');
+  mapaFrame.src='about:blank';
+}
+$('#btnMaps').addEventListener('click',abrirMapa);
+$('#mapaCerrar').addEventListener('click',cerrarMapa);
+mapaModal.addEventListener('click',e=>{ if(e.target===mapaModal) cerrarMapa(); });
+document.addEventListener('keydown',e=>{ if(e.key==='Escape') cerrarMapa(); });
+
+
 function actualizarHash(){
   const p=[];
   if(idxO>=0)p.push('o='+idxO);
@@ -484,9 +679,24 @@ function leerHash(){
   refrescar();
 }
 
-/* ── instalación PWA ── */
+/* ── instalación PWA y auto-actualización ── */
 if('serviceWorker' in navigator){
-  window.addEventListener('load',()=>navigator.serviceWorker.register('sw.js').catch(()=>{}));
+  window.addEventListener('load',()=>{
+    navigator.serviceWorker.register('sw.js').then(reg=>{
+      // buscar versión nueva cada vez que se abre/retoma la app
+      reg.update().catch(()=>{});
+      document.addEventListener('visibilitychange',()=>{
+        if(document.visibilityState==='visible') reg.update().catch(()=>{});
+      });
+    }).catch(()=>{});
+  });
+  // cuando el SW nuevo toma el control, recargar una sola vez para usar los archivos nuevos
+  let yaRecargo=false;
+  navigator.serviceWorker.addEventListener('controllerchange',()=>{
+    if(yaRecargo) return;
+    yaRecargo=true;
+    location.reload();
+  });
 }
 
 const yaInstalada = matchMedia('(display-mode: standalone)').matches || navigator.standalone===true;
